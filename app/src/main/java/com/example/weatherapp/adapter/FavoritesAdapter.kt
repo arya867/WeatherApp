@@ -20,6 +20,11 @@ class FavoritesAdapter(
     override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
         val favorite = favorites[position]
         holder.bind(favorite)
+
+        // Tambahkan klik listener
+        holder.itemView.setOnClickListener {
+            onItemClick(favorite)
+        }
     }
 
     override fun getItemCount(): Int = favorites.size
@@ -30,7 +35,6 @@ class FavoritesAdapter(
             binding.tvCountry.text = favoriteLocation.country
             binding.tvTime.text = favoriteLocation.time
             binding.tvTemperature.text = favoriteLocation.temperature
-//            binding.ivWeatherIcon.setImageResource(favoriteLocation.weatherIconRes)
 
             binding.root.setOnClickListener {
                 onItemClick(favoriteLocation)

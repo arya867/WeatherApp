@@ -21,17 +21,39 @@ class FavoritesActivity : AppCompatActivity() {
 
         val favorites = SharedPrefUtil.getFavorites(this).toMutableList()
 
-        adapter = FavoritesAdapter(
+//        adapter = FavoritesAdapter(
+//            favorites,
+//            onItemClick = { favorite ->
+//                // Kirimkan data kota yang dipilih ke MainActivity
+//                val resultIntent = Intent().apply {
+//                    putExtra("selected_city", favorite.city)
+//                }
+//                setResult(RESULT_OK, resultIntent)
+//                finish() // Kembali ke MainActivity
+//            },
+//            onDeleteClick = { favorite ->
+//                val position = favorites.indexOf(favorite)
+//                if (position != -1) {
+//                    favorites.removeAt(position)
+//                    SharedPrefUtil.saveFavorites(this, favorites)
+//                    adapter.notifyItemRemoved(position)
+//                }
+//            }
+//        )
+//        binding.recyclerViewFavorites.adapter = adapter
+
+        binding.recyclerViewFavorites.adapter = FavoritesAdapter(
             favorites,
-            onItemClick = { location ->
-                // Kirimkan data kota yang dipilih ke MainActivity
-                val intent = Intent()
-                intent.putExtra("selected_city", location.city)
-                setResult(RESULT_OK, intent)
-                finish() // Kembali ke MainActivity
+            onItemClick = { favorite ->
+                // Kirim data kembali ke MainActivity
+                val resultIntent = Intent().apply {
+                    putExtra("selected_city", favorite.country)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
             },
-            onDeleteClick = { location ->
-                val position = favorites.indexOf(location)
+            onDeleteClick = { favorite ->
+                val position = favorites.indexOf(favorite)
                 if (position != -1) {
                     favorites.removeAt(position)
                     SharedPrefUtil.saveFavorites(this, favorites)
@@ -40,7 +62,7 @@ class FavoritesActivity : AppCompatActivity() {
             }
         )
 
-        binding.recyclerViewFavorites.adapter = adapter
         binding.recyclerViewFavorites.layoutManager = LinearLayoutManager(this)
+
     }
 }

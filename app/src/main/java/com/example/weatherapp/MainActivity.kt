@@ -93,7 +93,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnFavorites.setOnClickListener {
             val intent = Intent(this, FavoritesActivity::class.java)
-            startActivityForResult(intent, 1)
+            startActivityForResult(
+                intent,
+                1
+            )
         }
     }
 
@@ -320,7 +323,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             val selectedCity = data?.getStringExtra("selected_city")
-            if (selectedCity != null) {
+            if (selectedCity != null && selectedCity.isNotBlank()) {
                 city = selectedCity
                 getCurrentWeather(city)
             }
