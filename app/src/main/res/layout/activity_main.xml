@@ -72,8 +72,27 @@
                 android:textColor="@color/black"
                 app:iconifiedByDefault="false"
                 app:queryHint="Search Here...."/>
-
         </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/btnFavorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Favorites"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@+id/glMainLocation" />
+
+        <Button
+            android:id="@+id/btnSaveFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save to Favorites" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline

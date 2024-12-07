@@ -35,18 +35,18 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
+import com.example.weatherapp.data.models.FavoriteLocation
+import com.example.weatherapp.utils.SharedPrefUtil
+import android.content.Intent
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-
     private lateinit var sheetLayoutBinding: BottomSheetLayoutBinding
 
     private lateinit var dialog: BottomSheetDialog
 
     lateinit var pollutionFragment: PollutionFragment
 
-    private var city: String = "jakarta"
-
+    private var city: String = "surabaya"
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
 
@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         pollutionFragment = PollutionFragment()
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        setContentView(binding.root)
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -83,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         getCurrentWeather(city)
 
         binding.tvForecast.setOnClickListener {
-
             OpenDialog()
         }
 
@@ -91,15 +91,22 @@ class MainActivity : AppCompatActivity() {
             fetchLocation()
         }
 
+        binding.btnFavorites.setOnClickListener {
+            val intent = Intent(this, FavoritesActivity::class.java)
+            startActivityForResult(intent, 1)
+        }
     }
 
-    private fun fetchLocation() {
-        val task: Task<Location> =  fusedLocationProviderClient.lastLocation
 
-            if (ActivityCompat.checkSelfPermission(
+
+    private fun fetchLocation() {
+        val task: Task<Location> = fusedLocationProviderClient.lastLocation
+
+        if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
@@ -108,18 +115,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         task.addOnSuccessListener {
-            val geocoder=Geocoder(this, Locale.getDefault())
+            val geocoder = Geocoder(this, Locale.getDefault())
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                geocoder.getFromLocation(it.latitude,it.longitude,1,object: Geocoder.GeocodeListener{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocation(it.latitude, it.longitude, 1, object : Geocoder.GeocodeListener {
                     override fun onGeocode(addresses: MutableList<Address>) {
                         city = addresses[0].locality
                     }
-
                 })
-            }else{
-                val address = geocoder.getFromLocation(it.latitude, it.longitude,1) as List<Address>
-
+            } else {
+                val address = geocoder.getFromLocation(it.latitude, it.longitude, 1) as List<Address>
                 city = address[0].locality
             }
 
@@ -229,6 +234,19 @@ class MainActivity : AppCompatActivity() {
                         getPollution(data.coord.lat,data.coord.lon)
                     }
 
+                    binding.btnSaveFavorite.setOnClickListener {
+                        val favorite = FavoriteLocation(
+                            city,
+                            data.sys.country,
+                            time = dateFormatConverter(data.dt.toLong()),  // Waktu update terakhir
+                            temperature = "${data.main.temp.toInt()}°C",  // Suhu saat ini
+                            weatherIconRes = "https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png"  // URL icon cuaca
+                        )
+                        val favorites = SharedPrefUtil.getFavorites(this@MainActivity).toMutableList()
+                        favorites.add(favorite)
+                        SharedPrefUtil.saveFavorites(this@MainActivity, favorites)
+                        Toast.makeText(this@MainActivity, "$city added to favorites", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -295,6 +313,18 @@ class MainActivity : AppCompatActivity() {
             "hh:mm a",
             Locale.ENGLISH
         ).format(Date(date * 1000))
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            val selectedCity = data?.getStringExtra("selected_city")
+            if (selectedCity != null) {
+                city = selectedCity
+                getCurrentWeather(city)
+            }
+        }
     }
 }
 

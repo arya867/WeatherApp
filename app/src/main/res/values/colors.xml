@@ -4,4 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="semi_transparent">#6DD0FD</color>
     <color name="transparent">#00FCFAFA</color>
+    <color name="cardBackground">#E3F2FD</color> <!-- Biru muda lembut -->
+    <color name="textPrimary">#37474F</color> <!-- Abu-abu tua -->
+    <color name="textSecondary">#607D8B</color> <!-- Abu-abu kebiruan -->
+    <color name="iconTint">#FF5722</color> <!-- Oranye cerah -->
 </resources>
